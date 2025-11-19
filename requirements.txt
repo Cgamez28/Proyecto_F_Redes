@@ -1,0 +1,8 @@
+# Requirements backend_api
+Flask
+psycopg2-binary
+
+# Requirements etl_scripts
+pandas
+sqlalchemy
+requests
