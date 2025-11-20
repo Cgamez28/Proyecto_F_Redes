@@ -31,25 +31,39 @@ def get_db_connection():
 # 1. Búsqueda de Políticos
 @app.route('/api/politicians/search', methods=['GET'])
 def search_politicians():
-    query = request.args.get('q', '') # Obtiene el parámetro ?q=nombre
+    # Recibimos parámetros (nombre, partido, riesgo mínimo)
+    query_name = request.args.get('q', '')
+    party_filter = request.args.get('party', '')
+    risk_filter = request.args.get('risk', '') # 'high', 'medium', 'low', 'all'
     
-    if not query:
-        return jsonify({'error': 'Debes enviar un término de búsqueda'}), 400
-
     conn = get_db_connection()
-    if not conn:
-        return jsonify({'error': 'Error de conexión a BD'}), 500
-    
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     
-    # Usamos ILIKE para búsqueda insensible a mayúsculas/minúsculas (ej: "juan" encuentra "JUAN")
-    sql = """
-        SELECT id, full_name, party, current_role, risk_score 
-        FROM politicians 
-        WHERE full_name ILIKE %s 
-        LIMIT 10;
-    """
-    cursor.execute(sql, (f'%{query}%',))
+    # Construcción dinámica de la consulta SQL
+    sql = "SELECT id, full_name, party, current_role, risk_score, image_url FROM politicians WHERE 1=1"
+    params = []
+
+    # Filtro por Nombre
+    if query_name:
+        sql += " AND full_name ILIKE %s"
+        params.append(f'%{query_name}%')
+    
+    # Filtro por Partido
+    if party_filter and party_filter != 'Todos':
+        sql += " AND party = %s"
+        params.append(party_filter)
+
+    # Filtro por Riesgo
+    if risk_filter == 'high':
+        sql += " AND risk_score >= 60"
+    elif risk_filter == 'medium':
+        sql += " AND risk_score >= 30 AND risk_score < 60"
+    elif risk_filter == 'low':
+        sql += " AND risk_score < 30"
+
+    sql += " ORDER BY risk_score DESC LIMIT 50;" # Ordenamos por los más riesgosos primero
+
+    cursor.execute(sql, tuple(params))
     results = cursor.fetchall()
     
     cursor.close()

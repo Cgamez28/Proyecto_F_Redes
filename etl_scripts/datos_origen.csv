@@ -1,5 +1,11 @@
-Nombre Completo,Partido Politico,Rol Actual,Votos Recientes
-JUAN PEREZ , Partido Liberal , Senador, Si;No;Si
-Maria Rodriguez,centro democratico,Representante,No;No;Absente
-CARLOS LOPEZ,  Pacto Historico,Senador,Si;Si;Si
-  Ana Gomez  ,Partido Verde,Senador,Si;Absente;Si
+Nombre Completo,Partido Politico,Rol Actual,Votos Recientes,Imagen_URL,Casos_Judiciales,Titulos_Academicos
+Juan Perez,Partido Liberal,Senador,Si;No;Si,https://ui-avatars.com/api/?name=Juan+Perez&background=0D8ABC&color=fff,,Derecho - U. Nacional|Maestría en Gobierno - Andes
+Ana Gomez,Partido Verde,Senadora,Si;Absente;Si,https://ui-avatars.com/api/?name=Ana+Gomez&background=10b981&color=fff,,Politología - Javeriana
+Carlos Lopez,Pacto Historico,Senador,Si;Si;Si,https://ui-avatars.com/api/?name=Carlos+Lopez&background=ef4444&color=fff,Investigación por presunto tráfico de influencias en contratos viales.|Indagación preliminar por financiación de campaña.,Economía - U. Externado
+Maria Rodriguez,Centro Democratico,Representante,No;No;Absente,https://ui-avatars.com/api/?name=Maria+Rodriguez&background=f59e0b&color=fff,Proceso disciplinario por inasistencia injustificada.,Administración - U. Rosario
+Pedro Sanchez,Cambio Radical,Senador,Absente;Absente;No,https://ui-avatars.com/api/?name=Pedro+Sanchez&background=ef4444&color=fff,Investigación por incremento patrimonial no justificado.|Caso Odebrecht (Vinculado).,Ingeniería Civil - U. Distrital
+Luisa Fernanda,Partido de la U,Representante,Si;Si;Si,https://ui-avatars.com/api/?name=Luisa+Fernanda&background=10b981&color=fff,,Derecho - U. Libre|Especialización en D. Administrativo
+Jorge Ramirez,Partido Conservador,Senador,No;No;No,https://ui-avatars.com/api/?name=Jorge+Ramirez&background=0D8ABC&color=fff,,Arquitectura - U. Piloto
+Claudia Torres,Pacto Historico,Representante,Si;Si;Si,https://ui-avatars.com/api/?name=Claudia+Torres&background=ef4444&color=fff,Denuncia por injuria y calumnia (Activo).,Sociología - U. Nacional
+Andres Martinez,Centro Democratico,Senador,No;No;No,https://ui-avatars.com/api/?name=Andres+Martinez&background=0D8ABC&color=fff,,Medicina - U. Militar
+Sofia Vargas,Partido Liberal,Representante,Si;Absente;Si,https://ui-avatars.com/api/?name=Sofia+Vargas&background=f59e0b&color=fff,,Comunicación Social - U. Sabana

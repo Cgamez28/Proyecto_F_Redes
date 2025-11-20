@@ -1,77 +1,79 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 # --- CONFIGURACIÓN ---
-# Cadena de conexión: postgresql://usuario:password@localhost:puerto/nombre_bd
+# ¡CAMBIA TU CONTRASEÑA AQUÍ!
 DB_URI = 'postgresql://postgres:12345@localhost:5432/corrupcion_co'
 
 def ejecutar_etl():
-    print("--- INICIANDO PROCESO ETL ---")
-
-    # ---------------------------------------------------------
-    # 1. EXTRACCIÓN (Extract) 
-    # ---------------------------------------------------------
-    print("1. Extrayendo datos de la fuente simulada...")
-    try:
-        # Leemos el archivo CSV como si fuera una descarga del gobierno
-        df_crudo = pd.read_csv('datos_origen.csv')
-        print(f"   -> Se encontraron {len(df_crudo)} registros.")
-    except FileNotFoundError:
-        print("Error: No se encontró el archivo datos_origen.csv")
-        return
-
-    # ---------------------------------------------------------
-    # 2. TRANSFORMACIÓN (Transform) 
-    # ---------------------------------------------------------
-    print("2. Transformando y limpiando datos...")
+    print("--- INICIANDO ETL AVANZADO ---")
     
-    # a. Estandarización de Nombres (Quitar espacios, convertir a Título)
-    # Esto soluciona la "información presentada en formatos de difícil acceso" [cite: 33]
-    df_crudo['Nombre Completo'] = df_crudo['Nombre Completo'].str.strip().str.title()
+    engine = create_engine(DB_URI)
     
-    # b. Estandarización de Partidos
-    df_crudo['Partido Politico'] = df_crudo['Partido Politico'].str.strip().str.title()
+    # 1. Limpiar la BD (Para no duplicar datos cada vez que corremos el script)
+    with engine.connect() as conn:
+        print("1. Limpiando base de datos antigua...")
+        conn.execute(text("TRUNCATE TABLE voting_records, judicial_records, academic_records, politicians CASCADE;"))
+        conn.commit()
+
+    # 2. Extracción
+    print("2. Leyendo CSV extendido...")
+    df = pd.read_csv('datos_origen.csv')
+    df = df.fillna('') # Reemplazar vacíos con strings vacíos
+
+    # 3. Transformación y Carga (Fila por Fila para manejar relaciones)
+    print("3. Procesando y Cargando registros...")
     
-    # c. Lógica de Negocio: Calcular un "Score de Riesgo" inicial
-    # Tu artículo menciona generar un "perfil de riesgo interactivo"[cite: 16].
-    # Aquí hacemos un cálculo simple: si tiene muchas ausencias ("Absente"), sube el riesgo.
-    def calcular_riesgo(votos):
-        if "Absente" in str(votos):
-            return 50.0 # Riesgo medio por ausentismo
-        return 10.0 # Riesgo bajo base
+    with engine.connect() as conn:
+        for index, row in df.iterrows():
+            # A. Calcular Riesgo
+            risk = 10.0
+            if "Absente" in row['Votos Recientes']: risk += 20
+            if row['Casos_Judiciales']: risk += 50 # Si tiene texto en casos, sube riesgo
+            risk = min(risk, 100.0)
 
-    df_crudo['risk_score'] = df_crudo['Votos Recientes'].apply(calcular_riesgo)
+            # B. Insertar Político
+            print(f"   -> Procesando: {row['Nombre Completo']}")
+            result = conn.execute(text("""
+                INSERT INTO politicians (full_name, party, current_role, risk_score, image_url)
+                VALUES (:name, :party, :role, :risk, :img)
+                RETURNING id
+            """), {
+                'name': row['Nombre Completo'].strip(),
+                'party': row['Partido Politico'].strip(),
+                'role': row['Rol Actual'].strip(),
+                'risk': risk,
+                'img': row['Imagen_URL'].strip()
+            })
+            
+            politician_id = result.fetchone()[0]
 
-    # d. Renombrar columnas para que coincidan con nuestra Base de Datos SQL
-    df_limpio = df_crudo.rename(columns={
-        'Nombre Completo': 'full_name',
-        'Partido Politico': 'party',
-        'Rol Actual': 'current_rol'
-    })
+            # C. Insertar Casos Judiciales (Separados por |)
+            if row['Casos_Judiciales']:
+                casos = row['Casos_Judiciales'].split('|')
+                for caso in casos:
+                    conn.execute(text("""
+                        INSERT INTO judicial_records (politician_id, case_number, description, status)
+                        VALUES (:pid, 'CASO-AUTO', :desc, 'En Investigación')
+                    """), {'pid': politician_id, 'desc': caso.strip()})
 
-    # Seleccionamos solo las columnas que existen en nuestra tabla 'politicians'
-    columnas_finales = ['full_name', 'party', 'current_rol', 'risk_score']
-    df_final = df_limpio[columnas_finales]
+            # D. Insertar Estudios (Separados por |)
+            if row['Titulos_Academicos']:
+                titulos = row['Titulos_Academicos'].split('|')
+                for titulo in titulos:
+                    # Intentamos separar "Carrera - Universidad"
+                    parts = titulo.split('-')
+                    degree = parts[0].strip()
+                    inst = parts[1].strip() if len(parts) > 1 else "Institución No Registrada"
+                    
+                    conn.execute(text("""
+                        INSERT INTO academic_records (politician_id, degree, institution, year)
+                        VALUES (:pid, :deg, :inst, 0)
+                    """), {'pid': politician_id, 'deg': degree, 'inst': inst})
+            
+        conn.commit()
     
-    print("   -> Datos transformados exitosamente.")
-
-    # ---------------------------------------------------------
-    # 3. CARGA (Load) 
-    # ---------------------------------------------------------
-    print("3. Cargando datos en PostgreSQL...")
-    
-    try:
-        # Crear el motor de conexión
-        engine = create_engine(DB_URI)
-        
-        # Insertar datos en la tabla 'politicians'. 
-        # 'if_exists="append"' agrega los datos sin borrar la tabla.
-        df_final.to_sql('politicians', engine, if_exists='append', index=False)
-        
-        print("   -> ¡Carga completada! Los datos están ahora centralizados.")
-        
-    except Exception as e:
-        print(f"Error conectando a la Base de Datos: {e}")
+    print("--- ETL FINALIZADO EXITOSAMENTE ---")
 
 if __name__ == "__main__":
     ejecutar_etl()
