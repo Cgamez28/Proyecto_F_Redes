@@ -1,38 +1,254 @@
-.App {
+/* src/App.css */
+
+:root {
+  --primary-color: #1e3a8a; /* Azul Institucional */
+  --bg-color: #f3f4f6;      /* Gris muy claro de fondo */
+  --card-bg: #ffffff;       /* Blanco para las tarjetas */
+  --text-main: #1f2937;     /* Gris oscuro para lectura */
+  --text-secondary: #6b7280;
+  --risk-high: #ef4444;     /* Rojo */
+  --risk-medium: #f59e0b;   /* Naranja */
+  --risk-low: #10b981;      /* Verde */
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+}
+
+.app-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Cabecera */
+.header {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  margin-bottom: 40px;
+  padding: 40px 0;
+  background: linear-gradient(135deg, var(--primary-color), #3b82f6);
   color: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.App-link {
-  color: #61dafb;
+.header h1 {
+  margin: 0;
+  font-size: 2.5rem;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.header p {
+  opacity: 0.9;
+  font-size: 1.1rem;
+}
+
+/* Buscador */
+.search-box {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 500px;
+  padding: 15px 20px;
+  font-size: 18px;
+  border: 2px solid #e5e7eb;
+  border-radius: 50px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.search-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+}
+
+/* Grilla de Resultados */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+/* Tarjeta de Político */
+.politician-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  border-left: 5px solid transparent; /* Borde indicador de riesgo */
+  position: relative;
+}
+
+.politician-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.card-header h2 {
+  margin: 0 0 5px 0;
+  color: var(--primary-color);
+}
+
+.party-name {
+  font-weight: bold;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.role-badge {
+  display: inline-block;
+  background-color: #e0e7ff;
+  color: var(--primary-color);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+/* Indicador de Riesgo */
+.risk-indicator {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.risk-label {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--text-secondary);
+}
+
+.risk-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+/* Clases dinámicas para colores */
+.risk-low { border-left-color: var(--risk-low); }
+.risk-low .risk-value { color: var(--risk-low); }
+
+.risk-medium { border-left-color: var(--risk-medium); }
+.risk-medium .risk-value { color: var(--risk-medium); }
+
+.risk-high { border-left-color: var(--risk-high); }
+.risk-high .risk-value { color: var(--risk-high); }
+
+/* --- NUEVOS ESTILOS --- */
+
+/* Navegación */
+.navbar {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover, .nav-btn.active {
+  border-bottom-color: #fbbf24; /* Amarillo */
+  font-weight: bold;
+}
+
+/* Imagen del Político en la Tarjeta */
+.card-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e5e7eb;
+  margin-bottom: 15px;
+  background-color: #ddd;
+}
+
+.politician-card {
+  cursor: pointer; /* Para indicar que es clickable */
+}
+
+/* VISTA DETALLE (Perfil Completo) */
+.detail-view {
+  background: white;
+  border-radius: 15px;
+  padding: 40px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.detail-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+
+.risk-badge-large {
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.section-title {
+  color: var(--primary-color);
+  border-left: 4px solid var(--risk-medium);
+  padding-left: 10px;
+  margin-top: 30px;
+}
+
+.corruption-case {
+  background-color: #fef2f2; /* Rojo muy suave */
+  border: 1px solid #fca5a5;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.back-btn {
+  background-color: var(--text-secondary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+/* Animación suave */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

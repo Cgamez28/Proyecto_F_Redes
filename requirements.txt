@@ -1,6 +1,7 @@
 # Requirements backend_api
 Flask
 psycopg2-binary
+flask-cors
 
 # Requirements etl_scripts
 pandas
